@@ -49,12 +49,22 @@ def save_demographics():
         data = request.json
         participant_id = data.get('prolific_id') or f"debug_participant_{uuid.uuid4().hex[:8]}"
         data['prolific_id'] = participant_id
+
         timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         filename = f"{participant_id}_demographics_{timestamp}.json"
-        filepath = os.path.join(app.config['DEMOGRAPHICS_STORAGE_FOLDER'], filename)
-        with open(filepath, 'w') as f:
-            json.dump(data, f, indent=4)
-        return jsonify({'message': 'Demographics saved successfully!', 'participant_id': participant_id}), 200
+
+        json_str = json.dumps(data, indent=4)
+
+        if USE_FIREBASE and bucket:
+            blob = bucket.blob(f"{participant_id}/{filename}")
+            blob.upload_from_string(json_str, content_type='application/json')
+            return jsonify({'message': 'Demographics saved to Firebase!', 'participant_id': participant_id}), 200
+        else:
+            local_path = os.path.join(app.config['DEMOGRAPHICS_STORAGE_FOLDER'], filename)
+            with open(local_path, 'w') as f:
+                f.write(json_str)
+            return jsonify({'message': 'Demographics saved locally!', 'participant_id': participant_id}), 200
+
     except Exception as e:
         traceback.print_exc()
         return jsonify({'error': f'Failed to save demographics: {str(e)}'}), 500
