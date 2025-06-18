@@ -17,7 +17,7 @@ USE_FIREBASE = True  # Set this to False for local development/testing
 if USE_FIREBASE and not firebase_admin._apps:
     cred = credentials.Certificate("/etc/secrets/serviceAccountKey.json")
     firebase_admin.initialize_app(cred, {
-        'storageBucket': 'speech-recorder-ff0e4.firebasestorage.app'
+        'storageBucket': 'speech-recorder-ff0e4'
     })
     bucket = storage.bucket()
 else:
