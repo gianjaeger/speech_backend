@@ -15,7 +15,7 @@ USE_FIREBASE = True  # Set this to False for local development/testing
 
 # Initialize Firebase app once
 if USE_FIREBASE and not firebase_admin._apps:
-    cred = credentials.Certificate("credentials/serviceAccountKey.json")
+    cred = credentials.Certificate("/etc/secrets/serviceAccountKey.json")
     firebase_admin.initialize_app(cred, {
         'storageBucket': 'speech-recorder-ff0e4.appspot.com'
     })
